@@ -94,11 +94,11 @@ def match(img1, img2):
 	score = 0;
 	for match in matches:
 		score += match.distance
-	score_threshold = 33
+	score_threshold = 50
 	if score/len(matches) < score_threshold:
-		return True
+		return True,score/len(matches)
 	else:
-		return False
+		return False, score/len(matches)
 
 
 

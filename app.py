@@ -66,6 +66,7 @@ def handle_new_faces(user_id):
   video_capture = cv2.VideoCapture(get_jetson_gstreamer_source(), cv2.CAP_GSTREAMER)
   
   face_found = False
+  count = 0
   while not face_found:
     ret, frame = video_capture.read()
 
@@ -78,8 +79,9 @@ def handle_new_faces(user_id):
 
     # Find all the face locations and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_found = len(face_locations)
-    print(face_found)
+    count += len(face_locations)
+    print(count)
+    if count > 3: face_found = True
 
   face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
   

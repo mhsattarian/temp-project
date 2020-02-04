@@ -24,6 +24,7 @@ def load_known_faces():
     try:
         with open("database/known_faces.dat", "rb") as face_data_file:
             known_face_encodings, known_face_metadata = pickle.load(face_data_file)
+            print(len(known_face_encodings), len(known_face_metadata))
             print("faces database loaded from disk.")
     except FileNotFoundError as e:
         print("No previous face data found - starting with a blank known face list.")
