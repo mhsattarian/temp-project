@@ -171,12 +171,10 @@ def match_fingers(found_user_id):
 ##################################################
 if __name__ == "__main__":
   while True:
-    print("----------------")
+    print("------%------")
     # print("Size of template library: ", finger.library_size)
-    print("e) enroll user")
-    print("f) find user")
-    print("q) quit")
-    print("----------------")
+    print("e) enroll user \t f) find user \t q) quit")
+    print("\n")
     c = input("> ")
 
     if c == 'e':

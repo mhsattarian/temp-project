@@ -206,48 +206,49 @@ def get_num(max_number):
     return i
 
 
-while True:
-    print("----------------")
-    if finger.read_templates() != adafruit_fingerprint.OK:
-        raise RuntimeError('Failed to read templates')
-    print("Fingerprint templates: ", finger.templates)
-    if finger.count_templates() != adafruit_fingerprint.OK:
-        raise RuntimeError('Failed to read templates')
-    print("Number of templates found: ", finger.template_count)
-    if finger.read_sysparam() != adafruit_fingerprint.OK:
-        raise RuntimeError('Failed to get system parameters')
-    print("Size of template library: ", finger.library_size)
-    print("e) enroll print")
-    print("f) find print")
-    print("d) delete print")
-    print("s) save fingerprint image")
-    print("r) reset library")
-    print("q) quit")
-    print("----------------")
-    c = input("> ")
+if __name__ == "__main__":
+    while True:
+        print("----------------")
+        if finger.read_templates() != adafruit_fingerprint.OK:
+            raise RuntimeError('Failed to read templates')
+        print("Fingerprint templates: ", finger.templates)
+        if finger.count_templates() != adafruit_fingerprint.OK:
+            raise RuntimeError('Failed to read templates')
+        print("Number of templates found: ", finger.template_count)
+        if finger.read_sysparam() != adafruit_fingerprint.OK:
+            raise RuntimeError('Failed to get system parameters')
+        print("Size of template library: ", finger.library_size)
+        print("e) enroll print")
+        print("f) find print")
+        print("d) delete print")
+        print("s) save fingerprint image")
+        print("r) reset library")
+        print("q) quit")
+        print("----------------")
+        c = input("> ")
 
-    if c == 'e':
-        enroll_finger(get_num(finger.library_size))
-    if c == 'f':
-        if get_fingerprint():
-            print("Detected #", finger.finger_id, "with confidence", finger.confidence)
-        else:
-            print("Finger not found")
-    if c == 'd':
-        if finger.delete_model(get_num(finger.library_size)) == adafruit_fingerprint.OK:
-            print("Deleted!")
-        else:
-            print("Failed to delete")
-    if c == 's':
-        if save_fingerprint_image("fingerprint.png"):
-            print("Fingerprint image saved")
-        else:
-            print("Failed to save fingerprint image")
-    if c == 'r':
-        if finger.empty_library() == adafruit_fingerprint.OK:
-            print("Library empty!")
-        else:
-            print("Failed to empty library")
-    if c == 'q':
-        print("Exiting fingerprint example program")
-        raise SystemExit
+        if c == 'e':
+            enroll_finger(get_num(finger.library_size))
+        if c == 'f':
+            if get_fingerprint():
+                print("Detected #", finger.finger_id, "with confidence", finger.confidence)
+            else:
+                print("Finger not found")
+        if c == 'd':
+            if finger.delete_model(get_num(finger.library_size)) == adafruit_fingerprint.OK:
+                print("Deleted!")
+            else:
+                print("Failed to delete")
+        if c == 's':
+            if save_fingerprint_image("fingerprint.png"):
+                print("Fingerprint image saved")
+            else:
+                print("Failed to save fingerprint image")
+        if c == 'r':
+            if finger.empty_library() == adafruit_fingerprint.OK:
+                print("Library empty!")
+            else:
+                print("Failed to empty library")
+        if c == 'q':
+            print("Exiting fingerprint example program")
+            raise SystemExit

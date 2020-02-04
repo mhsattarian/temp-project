@@ -3,7 +3,7 @@ import os
 import sys
 import numpy
 import matplotlib.pyplot as plt
-from enhance_figners import image_enhance
+from enhance_fingers import image_enhance
 from skimage.morphology import skeletonize, thin
 
 # os.chdir("/app/")
