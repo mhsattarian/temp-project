@@ -34,11 +34,11 @@ def get_fingerprint():
         pass
     print("Templating...")
     if finger.image_2_tz(1) != adafruit_fingerprint.OK:
-        return False
+        return False, finger.finger_id, finger.confidence
     print("Searching...")
     if finger.finger_fast_search() != adafruit_fingerprint.OK:
-        return False
-    return True
+        return False, finger.finger_id, finger.confidence
+    return True, finger.finger_id, finger.confidence
 
 # pylint: disable=too-many-branches
 def get_fingerprint_detail():
@@ -158,8 +158,8 @@ def enroll_finger(location):
 
 def save_fingerprint_image(filename):
     """Scan fingerprint then save image to filename."""
-    while finger.get_image():
-        pass
+    # while finger.get_image():
+    #     pass
 
     # let PIL take care of the image headers and file structure
     from PIL import Image
@@ -194,7 +194,7 @@ def save_fingerprint_image(filename):
 
 ##################################################
 
-def get_num(max_number):
+def get_num(max_number= finger.library_size):
     """Use input() to get a valid number from 0 to the maximum size
     of the library. Retry till success!"""
     i = -1
@@ -205,18 +205,22 @@ def get_num(max_number):
             pass
     return i
 
+def num_id():
+    print(finger.library_size)
+    return finger.library_size
+
+if finger.read_templates() != adafruit_fingerprint.OK:
+    raise RuntimeError('Failed to read templates')
+print("Fingerprint templates: ", finger.templates)
+if finger.count_templates() != adafruit_fingerprint.OK:
+    raise RuntimeError('Failed to read templates')
+print("Number of templates found: ", finger.template_count)
+if finger.read_sysparam() != adafruit_fingerprint.OK:
+    raise RuntimeError('Failed to get system parameters')
 
 if __name__ == "__main__":
     while True:
         print("----------------")
-        if finger.read_templates() != adafruit_fingerprint.OK:
-            raise RuntimeError('Failed to read templates')
-        print("Fingerprint templates: ", finger.templates)
-        if finger.count_templates() != adafruit_fingerprint.OK:
-            raise RuntimeError('Failed to read templates')
-        print("Number of templates found: ", finger.template_count)
-        if finger.read_sysparam() != adafruit_fingerprint.OK:
-            raise RuntimeError('Failed to get system parameters')
         print("Size of template library: ", finger.library_size)
         print("e) enroll print")
         print("f) find print")
@@ -228,10 +232,11 @@ if __name__ == "__main__":
         c = input("> ")
 
         if c == 'e':
-            enroll_finger(get_num(finger.library_size))
+            enroll_finger(get_num())
         if c == 'f':
-            if get_fingerprint():
-                print("Detected #", finger.finger_id, "with confidence", finger.confidence)
+            r, _id, _confidence = get_fingerprint()
+            if r:
+                print("Detected #", _id, "with confidence", _confidence)
             else:
                 print("Finger not found")
         if c == 'd':

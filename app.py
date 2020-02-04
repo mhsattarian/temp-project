@@ -4,7 +4,7 @@ from multiprocessing import Process
 import cv2
 
 # Fingerprint Recognition
-from fingerprint_simpletest_rpi import get_fingerprint, save_fingerprint_image
+from fingerprint_simpletest_rpi import num_id, enroll_finger, get_fingerprint, save_fingerprint_image
 import serial
 import adafruit_fingerprint
 from finger_match import match as f_match
@@ -34,12 +34,14 @@ load_known_faces()
 
 ##################################################
 def enroll_user():
-  user_id = input('(user ID)> ')
+  user_id = int(input("Enter ID # from 0-{}: ".format(num_id())))
 
   # create user directory
-  user_dir = os.path.join(database_directory, user_id)
+  user_dir = os.path.join(database_directory, str(user_id))
   if not os.path.exists(user_dir):
     os.makedirs(user_dir)
+
+  enroll_finger(user_id)
 
   # get finger image
   while finger.get_image():
@@ -51,7 +53,7 @@ def enroll_user():
   p_save_img.start()
 
   # get user image
-  handle_new_faces(user_id)
+  handle_new_faces(str(user_id))
 
 
   p_save_img.join()
@@ -103,31 +105,44 @@ def handle_new_faces(user_id):
   cv2.destroyAllWindows()
 
 def find_user():
-  # get finger image
-  while finger.get_image():
-    pass
+  # # get finger image
+  # while finger.get_image():
+  #   pass
 
-  # save finger image in parallel
-  temp_finger_img_addr = os.path.join(temp_dir, 'finger.png')
-  p_save_img = Process(target=save_fingerprint_image, args=(temp_finger_img_addr,))
-  p_save_img.start()
+  r, _id, _confidence = get_fingerprint()
+
+  while not r:
+    print('finger dont match! try again. \n')
+    r, _id, _confidence = get_fingerprint()
+
+
+  # # save finger image in parallel
+  # temp_finger_img_addr = os.path.join(temp_dir, 'finger.png')
+  # p_save_img = Process(target=save_fingerprint_image, args=(temp_finger_img_addr,))
+  # p_save_img.start()
 
 
   found_user_id = find_face()
-  print('found_user_id: ', found_user_id)
+  # print('found_user_id: ', found_user_id)
 
-  f_result = match_fingers(found_user_id)
-  if f_result: print('fingers match')
-  else: print('fingers don\'t match')
+  # f_result = match_fingers(found_user_id)
+  # if f_result: print('fingers match')
+  # else: print('fingers don\'t match')
+
+
+  print(f'finger {r} | \t user_id: {_id} confidence: {_confidence}')
+  print(f'face | \t user_id: {found_user_id}')
+  
 
   
-  p_save_img.join()
+  # p_save_img.join()
 
 def find_face():
   # Grab a single frame of video
   video_capture = cv2.VideoCapture(get_jetson_gstreamer_source(), cv2.CAP_GSTREAMER)
   
   face_found = False
+  count = 0
   while not face_found:
     ret, frame = video_capture.read()
 
@@ -140,8 +155,9 @@ def find_face():
 
     # Find all the face locations and face encodings in the current frame of video
     face_locations = face_recognition.face_locations(rgb_small_frame)
-    face_found = len(face_locations)
-    print(face_found)
+    count += len(face_locations)
+    print(count)
+    if count > 3: face_found = True
   
   face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 

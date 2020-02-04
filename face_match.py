@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import platform
 import pickle
+import os
 
 
 # Our list of known face encodings and a matching list of metadata about each face.
@@ -21,10 +22,22 @@ def save_known_faces():
 def load_known_faces():
     global known_face_encodings, known_face_metadata
 
+    database_items = sorted([i for i in os.listdir('./database') if i != 'known_faces.dat'])
+
     try:
         with open("database/known_faces.dat", "rb") as face_data_file:
             known_face_encodings, known_face_metadata = pickle.load(face_data_file)
-            print(len(known_face_encodings), len(known_face_metadata))
+
+            idx_to_del = []
+            for idx, item in enumerate(known_face_metadata):
+                if item['user_id'] not in database_items:
+                    idx_to_del.append(idx)
+                    
+            idx_to_del = reversed(sorted(idx_to_del))
+            for i in idx_to_del:
+                del(known_face_encodings[i])
+                del(known_face_metadata[i])
+
             print("faces database loaded from disk.")
     except FileNotFoundError as e:
         print("No previous face data found - starting with a blank known face list.")
